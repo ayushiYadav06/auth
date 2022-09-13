@@ -1,34 +1,61 @@
-import React from "react";
-import "./Login.css";
-const Login = () => {
-  const log = () => {
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-    const mail = localStorage.getItem("email");
-    const pass = localStorage.getItem("password");
+import React, { useState } from "react";
+import { signIn } from "../services/auth";
+import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-    if (email == mail && password == pass) alert("successfully login");
-    else alert("email and password does not match");
+const initialValue = {
+  fullName: "",
+  email: "",
+  password: "",
+};
+const Login = () => {
+  let navigate = useNavigate();
+  const [formData, setFormData] = useState(initialValue);
+  function handleData() {
+    signIn(formData);
+    navigate(`/dashboard`);
+  }
+
+  const inputChangeHandler = (e) => {
+    e.preventDefault();
+
+    const { name, value } = e.target;
+    setFormData((pre) => {
+      return { ...pre, [name]: value };
+    });
   };
+
   return (
-    <div className="outerContainer">
-      <h1>Login</h1>
-      <form className="innerContainer">
+    <div className="form-container">
+      <form>
+        <h1 className="primary-heading">Login Form</h1>
+
         <label className="email">Email</label>
-        <input type="email" placeholder="Enter your Email" id="mail" />
-        <br />
+        <input
+          type="email"
+          name="email"
+          id="email"
+          placeholder="Enter your Email"
+          onChange={inputChangeHandler}
+        />
 
         <label className="password">Password</label>
         <input
           type="password"
-          id="pass"
+          name="password"
+          id="password"
           placeholder="Enter your Password"
-          autoComplete="true"
+          autoComplete="false"
+          onChange={inputChangeHandler}
         />
-        <br />
-        <button className="btn" onClick={log}>
+
+        <button type="button" className="btn" onClick={handleData}>
           Login
         </button>
+        <div className="redirect-div">
+          {" "}
+          Don't have an account <Link to="/registration">Register</Link>
+        </div>
       </form>
     </div>
   );

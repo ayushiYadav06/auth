@@ -1,48 +1,40 @@
 import React, { useState } from "react";
-import Login from "./Login";
-import "./Registration.css";
+import { isEmailExist, signUp } from "../services/auth";
+import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
 const initialValue = {
-  name: "",
   email: "",
   password: "",
 };
 function Registration() {
+
   const [formData, setFormData] = useState(initialValue);
+  let navigate = useNavigate();
   function handleData() {
-    if (isEmailExist()) {
+    if (isEmailExist(formData.email)) {
       alert("email already exist !");
       return;
     }
-    const usersList = JSON.parse(localStorage.getItem("USERS_LIST")) || {};
-
-    localStorage.setItem(
-      "USERS_LIST",
-      JSON.stringify({
-        ...usersList,
-        [formData.email.toLowerCase()]: {
-          fullName: formData.fullName,
-          password: formData.password,
-        },
-      })
-    );
+    signUp(formData)
+    navigate(`/dashboard`);
   }
+
   const inputChangeHandler = (e) => {
     e.preventDefault();
+
     const { name, value } = e.target;
     setFormData((pre) => {
-      return { ...pre, [name]: [value] };
+      return { ...pre, [name]: value };
     });
-  };
-  const isEmailExist = () => {
-    const usersList = JSON.parse(localStorage.getItem("USERS_LIST")) || {};
-    if (usersList[formData.email.toLowerCase()]) return true;
-    return false;
+
   };
 
+
   return (
-    <div className="form">
-      <h1>Registration Form</h1>
-      <form className="innerform">
+    <div className="form-container">
+      <form>
+        <h1 className="primary-heading">Registration Form</h1>
         <label className="fullname">Full Name</label>
         <input
           type="text"
@@ -51,7 +43,6 @@ function Registration() {
           id="name"
           onChange={inputChangeHandler}
         />
-        <br />
 
         <label className="email">Email</label>
         <input
@@ -61,7 +52,6 @@ function Registration() {
           placeholder="Enter your Email"
           onChange={inputChangeHandler}
         />
-        <br />
 
         <label className="password">Password</label>
         <input
@@ -69,17 +59,16 @@ function Registration() {
           name="password"
           id="password"
           placeholder="Enter your Password"
-          autoComplete="true"
+          autoComplete="false"
           onChange={inputChangeHandler}
         />
-        <br />
 
-        <button type="submit" className="btn" onClick={handleData}>
-          {" "}
-          register{" "}
+        <button type="button" className="btn" onClick={handleData}>
+
+          Register
         </button>
+        <div className="redirect-div"> Already Have an account? <Link to="/">Login Here</Link></div>
       </form>
-      <a href="Login.js">login page </a>
     </div>
   );
 }
